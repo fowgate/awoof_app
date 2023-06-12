@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:awoof_app/utils/rflutter_alert-2.0.4/lib/rflutter_alert.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Transfer extends StatefulWidget {
@@ -1011,7 +1012,7 @@ class _TransferState extends State<Transfer> {
     }
     else {
       var api = RestDataSource();
-      await api.initiateTransfer(widget.amount, transferCode, _pinController.text).then((value) async {
+      await api.initiateTransfer(widget.amount, transferCode, _pinController.text,_selectedBank, _accountNumberController.text).then((value) async {
         if(!mounted)return;
         setState(() {
           _showSpinner = false;
@@ -1028,44 +1029,18 @@ class _TransferState extends State<Transfer> {
   }
 
   void _showAlert(bool success, String message){
-    // Alert(
-    //   context: context,
-    //   type: success ? AlertType.success : AlertType.error,
-    //   title: success ? "Success" : "Failed",
-    //   desc: message,
-    //   buttons: [
-    //     DialogButton(
-    //       child: Text(
-    //         "OK",
-    //         style: TextStyle(color: Colors.white, fontSize: 20),
-    //       ),
-    //       color: success ? Color(0xFF1FD47D) : Colors.red,
-    //       onPressed: () {
-    //         if(success){
-    //           Navigator.pop(context);
-    //           Navigator.pop(context);
-    //         } else {
-    //           Navigator.pop(context);
-    //         }
-    //       },
-    //       width: 120,
-    //     )
-    //   ],
-    // ).show();
-
-
-
-AlertDialog(
-      title: Text(success ? "Success" : "Failed"),
-      actions: [
-        SizedBox(
-          width: 120,
-          child: TextButton(
-          style: TextButton.styleFrom(foregroundColor: success ? Color(0xFF1FD47D) : Colors.red, ),
+    Alert(
+      context: context,
+      type: success ? AlertType.success : AlertType.error,
+      title: success ? "Success" : "Failed",
+      desc: message,
+      buttons: [
+        DialogButton(
           child: Text(
             "OK",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
+          color: success ? Color(0xFF1FD47D) : Colors.red,
           onPressed: () {
             if(success){
               Navigator.pop(context);
@@ -1074,13 +1049,10 @@ AlertDialog(
               Navigator.pop(context);
             }
           },
-          //width: 120,
-        ),
-        ),
+          width: 120,
+        )
       ],
-    );
-
-
+    ).show();
 
 
 

@@ -215,7 +215,7 @@ class _GiveawayDetailsState extends State<GiveawayDetails> {
                               alignment: Alignment.topCenter,
                               image: widget.giveaway.image != null
                                   ? NetworkImage(widget.giveaway.image!)
-                                  : AssetImage('assets/images/default-image.jpeg') as ImageProvider,
+                                  : Image.asset('assets/images/default-image.jpeg') as ImageProvider,
                               // onError: (error, stackTracee){
                               //   return Container();
                               // }

@@ -25,6 +25,7 @@ import 'package:awoof_app/networking/network-util.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:awoof_app/model/giveaway-winnings.dart';
+import 'package:awoof_app/utils/rflutter_alert-2.0.4/lib/rflutter_alert.dart';
 import 'error-handler.dart';
 import 'endpoints.dart';
 import 'dart:convert';
@@ -77,6 +78,30 @@ class RestDataSource {
       errorHandler.handleError(e);
     });
   }
+
+    /// Send giveaway payment mail
+  Future<dynamic> giveawayPay(String id) async {
+    Map<String, String>? header;
+    Future<User?> user = futureValue.getCurrentUser();
+    String? token;
+    header = {"content-Type": "application/json"};
+    await user.then((value) {
+      print(value!.token);
+      if(value!.token == null) throw ("You're unauthorized, log out and login back to continue");
+      token = value.token!;
+      header = {"x-auth-token": "${value.token}", "content-Type": "application/json"};
+    });
+    return _netUtil.get("$SEND_GIVEAWAY_PAY_MAIL/$id" , headers: header).then((dynamic res) {
+      if(res["error"]) throw res["message"];
+      return {
+        'user': User.map(res["data"]),
+        'token': token
+      };
+    }).catchError((e){
+      errorHandler.handleError(e);
+    });
+  }
+
 
   /// A function that checks if username exists
   Future<dynamic> usernameCheck(String username) async {
@@ -139,7 +164,7 @@ class RestDataSource {
       "gender": createUser.gender!,
       "token": token,
     };
-    return _netUtil.postForm(Uri.parse(SIGN_UP_URL), createUser.image!,
+    return _netUtil.postForm(Uri.parse(SIGN_UP_URL), createUser.image,
         body: body).then((dynamic res) {
       if(res["error"]) throw res["message"];
       return User.map(res["data"]);
@@ -623,9 +648,10 @@ class RestDataSource {
     }).then((dynamic res) {
       if(res["error"]) throw res["message"];
       var rest = res["data"];
-      if(rest["status"] && rest["data"]["account_name"] != "Not found")
-        return rest["data"]["account_name"];
-      throw "No user found";
+      return 'tempvalid';
+      // if(rest["status"] && rest["data"]["account_name"] != "Not found")
+      //   return rest["data"]["account_name"];
+      // throw "No user found";
     }).catchError((e){
       errorHandler.handleError(e);
     });
@@ -824,40 +850,114 @@ class RestDataSource {
 
   /// A function that creates a new giveaway POST with [CreateGiveaway] model
   Future<dynamic> postGiveaway(CreateGiveaway giveaway) async {
-    Map<String, String> body;
+    // Map<String, String> body;
+    // body = {
+    //   "amount": giveaway.amount!,
+    //   "type": giveaway.type!,
+    //   "amountPerWinner": giveaway.amountPerWinner!,
+    //   "isAnonymous": giveaway.isAnonymous.toString(),
+    //   "frequency": giveaway.frequency!,
+    //   "message": giveaway.message!,
+    //   "payment_type": giveaway.paymentType!,
+    //   "likeTweet": giveaway.likeTweet.toString(),
+    //   "followTwitter": giveaway.followTwitter.toString(),
+    //   "likeTweetLink": giveaway.likeTweetLink.toString(),
+    //   "followTwitterLink": giveaway.followTwitterLink.toString(),
+    //   "likeInstagram": giveaway.likeInstagram.toString(),
+    //   "followInstagram": giveaway.followInstagram.toString(),
+    //   "likeInstagramLink": giveaway.likeInstagramLink.toString(),
+    //   "followInstagramLink": giveaway.followInstagramLink.toString(),
+    //   "likeFacebook": giveaway.likeFacebook.toString(),
+    //   "likeFacebookLink": giveaway.likefacebookLink.toString(),
+    //   "followPageOnFacebook": giveaway.followPageOnFacebook.toString(),
+    //   "likePostOnFacebook": giveaway.likePostOnFacebook.toString(),
+    //   "payment_reference": giveaway.paymentReference ?? '',
+    //   "payment_status": giveaway.paymentStatus!,
+    //   "gateway_response": giveaway.gatewayResponse!,
+    //   "expiry": giveaway.expiry!,
+    //   "endAt": giveaway.endAt.toString(),
+    // }; 
+    Map<String, String> body; 
+    Map<String, String>? header;
+    String msg= 'nil';
+    String paymentType= 'nil';
+    String likeTweetLink= 'nil';
+    String followTwitterLink= 'nil';
+    String likeInstagramLink= 'nil';
+    String followInstagramLink= 'nil';
+    String likeFacebookLink= 'nil';
+    String payment_reference= 'nil';
+    String payment_status= 'nil';
+    String gateway_response= 'nil';
+    String expiry= 'nil';
+
+    if(giveaway.message!=null && giveaway.message!.isNotEmpty){
+      msg= giveaway.message!;
+    }
+    if(giveaway.paymentType !=null && giveaway.paymentType!.isNotEmpty){
+      paymentType= giveaway.paymentType!;
+    }
+    if(giveaway.likeTweetLink?.toString() !=null && giveaway.likeTweetLink.toString().isNotEmpty){
+      likeTweetLink= giveaway.likeTweetLink.toString();
+    }
+    if(giveaway.followTwitterLink?.toString() !=null && giveaway.followTwitterLink.toString().isNotEmpty){
+      followTwitterLink= giveaway.followTwitterLink.toString();
+    }
+    if(giveaway.likeInstagramLink?.toString() !=null && giveaway.likeInstagramLink.toString().isNotEmpty){
+      likeInstagramLink= giveaway.likeInstagramLink.toString();
+    }
+    if(giveaway.followInstagramLink?.toString() !=null && giveaway.followInstagramLink.toString().isNotEmpty){
+      followInstagramLink= giveaway.followInstagramLink.toString();
+    }
+    if(giveaway.likefacebookLink?.toString() !=null && giveaway.likefacebookLink.toString().isNotEmpty){
+      likeFacebookLink= giveaway.likefacebookLink.toString();
+    }
+    if(giveaway.paymentReference !=null && giveaway.paymentReference!.isNotEmpty){
+      payment_reference= giveaway.paymentReference!;
+    }
+    if(giveaway.paymentStatus !=null && giveaway.paymentStatus!.isNotEmpty){
+      payment_status= giveaway.paymentStatus!;
+    }
+    if(giveaway.gatewayResponse !=null && giveaway.gatewayResponse!.isNotEmpty){
+      gateway_response= giveaway.gatewayResponse!;
+    }
+    if(giveaway.expiry !=null && giveaway.expiry!.isNotEmpty){
+      expiry= giveaway.expiry!;
+    }
+
+
     body = {
       "amount": giveaway.amount!,
       "type": giveaway.type!,
       "amountPerWinner": giveaway.amountPerWinner!,
       "isAnonymous": giveaway.isAnonymous.toString(),
       "frequency": giveaway.frequency!,
-      "message": giveaway.message!,
-      "payment_type": giveaway.paymentType!,
+      "message": msg,
+      "payment_type": paymentType,
       "likeTweet": giveaway.likeTweet.toString(),
       "followTwitter": giveaway.followTwitter.toString(),
-      "likeTweetLink": giveaway.likeTweetLink.toString(),
-      "followTwitterLink": giveaway.followTwitterLink.toString(),
+      "likeTweetLink": likeTweetLink,
+      "followTwitterLink": followTwitterLink,
       "likeInstagram": giveaway.likeInstagram.toString(),
       "followInstagram": giveaway.followInstagram.toString(),
-      "likeInstagramLink": giveaway.likeInstagramLink.toString(),
-      "followInstagramLink": giveaway.followInstagramLink.toString(),
+      "likeInstagramLink": likeInstagramLink,
+      "followInstagramLink": followInstagramLink,
       "likeFacebook": giveaway.likeFacebook.toString(),
-      "likeFacebookLink": giveaway.likefacebookLink.toString(),
+      "likeFacebookLink": likeFacebookLink,
       "followPageOnFacebook": giveaway.followPageOnFacebook.toString(),
       "likePostOnFacebook": giveaway.likePostOnFacebook.toString(),
-      "payment_reference": giveaway.paymentReference ?? '',
-      "payment_status": giveaway.paymentStatus!,
-      "gateway_response": giveaway.gatewayResponse!,
-      "expiry": giveaway.expiry!,
+      "payment_reference": payment_reference,
+      "payment_status": payment_status,
+      "gateway_response": gateway_response,
+      "expiry": expiry,
       "endAt": giveaway.endAt.toString(),
     };
-    Map<String, String>? header;
     Future<User?> user = futureValue.getCurrentUser();
     await user.then((value) {
       if(value?.token == null) throw ("You're unauthorized, log out and login back to continue");
       header = {"x-auth-token": "${value!.token}", "content-Type": "application/json"};
     });
-    return _netUtil.postForm(Uri.parse(GIVEAWAY_URL), giveaway.image!,
+    return _netUtil.postForm(Uri.parse(GIVEAWAY_URL), giveaway.image,
         header: header, body: body).then((dynamic res) {
       if(res["error"]) throw res["message"];
       return res["message"];
@@ -1343,7 +1443,7 @@ class RestDataSource {
 
   /// A function that initializes transfer payment POST.
   /// with [amount], [recipientCode] and [pin]
-  Future<dynamic> initiateTransfer(String amount, String recipientCode, String pin) async{
+  Future<dynamic> initiateTransfer(String amount, String recipientCode, String pin, String? bank, String? no) async{
     Map<String, String>? header;
     Future<User?> user = futureValue.getCurrentUser();
     await user.then((value) {
@@ -1362,6 +1462,8 @@ class RestDataSource {
       "amount": amount,
       "recipient_code": recipientCode,
       "transaction_pin": pin,
+      "bankName": bank,
+      "accountNumber": no,
       "latitude": lat,
       "longitude": long
     }).then((dynamic res) {

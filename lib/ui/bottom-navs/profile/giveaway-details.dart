@@ -276,7 +276,7 @@ class _MyGiveawayDetailsState extends State<MyGiveawayDetails> {
                               fit: BoxFit.cover,
                               image: widget.giveaway.image! != null
                                   ? NetworkImage(widget.giveaway.image!)
-                                  : AssetImage('assets/images/default-image.jpeg') as ImageProvider,
+                                  : Image.asset('assets/images/default-image.jpeg') as ImageProvider,
                             ),
                           ),
                           height: SizeConfig.screenHeight! * 0.43,

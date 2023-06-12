@@ -302,7 +302,7 @@ class _GiveawayTasksState extends State<GiveawayTasks> {
                                 alignment: Alignment.topCenter,
                                 image: widget.giveaway.image != null
                                     ? NetworkImage(widget.giveaway.image!)
-                                    : AssetImage('assets/images/default-image.jpeg') as ImageProvider,
+                                    : Image.asset('assets/images/default-image.jpeg') as ImageProvider,
                               ),
                             ),
                             height: 100,

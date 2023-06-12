@@ -78,7 +78,7 @@ class NetworkHelper{
 
   /// A function to do any post request of form data with the url and headers
   /// then sends back a json decoded result
-  Future<dynamic> postForm(Uri url, List<http.MultipartFile> files, {Map<String, String>? header, body, encoding}) async {
+  Future<dynamic> postForm(Uri url, List<http.MultipartFile>? files, {Map<String, String>? header, body, encoding}) async {
     try {
       var request = http.MultipartRequest('POST', url);
       if(header != null){

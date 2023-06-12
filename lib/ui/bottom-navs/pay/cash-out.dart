@@ -10,9 +10,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:in_app_review/in_app_review.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:awoof_app/utils/rflutter_alert-2.0.4/lib/rflutter_alert.dart';
 import 'package:awoof_app/model/banks.dart';
 import 'package:awoof_app/model/nigerian-banks.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:awoof_app/ui/bottom-navs/pay/wallet.dart';
 
 class CashOut extends StatefulWidget {
 
@@ -971,20 +973,25 @@ class _CashOutState extends State<CashOut> {
   /// Function that creates transfer to get the recipient code by calling
   /// [createTransfer] in the [RestDataSource] class
   void _createTransfer(Banks bank, StateSetter setModalState) async {
-    var api = RestDataSource();
-    await api.createTransfer(bank.accountNumber!, bank.bankCode!).then((value) async {
-      if(_transferWith == 'instant'){
-        _initiateTransfer(bank, value, setModalState);
+    // var api = RestDataSource();
+    // await api.createTransfer(bank.accountNumber!, bank.bankCode!).then((value) async {
+    //   if(_transferWith == 'instant'){
+    //     _initiateTransfer(bank, value, setModalState);
+    //   } else {
+    //     _freeWithdrawal(bank, value, setModalState);
+    //   }
+    // }).catchError((error) {
+    //   if(!mounted)return;
+    //   setModalState(() {
+    //     _showSpinner = false;
+    //   });
+    //   Constants.showError(context, error);
+    // });
+    if(_transferWith == 'instant'){
+        _initiateTransfer(bank, 'XXXX', setModalState);
       } else {
-        _freeWithdrawal(bank, value, setModalState);
+        _freeWithdrawal(bank, 'XXXX', setModalState);
       }
-    }).catchError((error) {
-      if(!mounted)return;
-      setModalState(() {
-        _showSpinner = false;
-      });
-      Constants.showError(context, error);
-    });
   }
 
   /// Function that initializes transfer by calling
@@ -998,7 +1005,7 @@ class _CashOutState extends State<CashOut> {
     }
     else {
       var api = RestDataSource();
-      await api.initiateTransfer(widget.amount, transferCode, _pinController.text).then((value) async {
+      await api.initiateTransfer(widget.amount, transferCode, _pinController.text, _selectedBank!,_accountNumberController.text).then((value) async {
         if(!mounted)return;
         setModalState(() { _showSpinner = false; });
         _showAlert(true, '${Constants.money(double.parse(widget.amount) - _getFee(), 'N')} will be deposited to your bank account shortly');
@@ -1035,72 +1042,52 @@ class _CashOutState extends State<CashOut> {
       }).catchError((error) {
         if(!mounted)return;
         setModalState(() { _showSpinner = false; });
-        _showAlert(false, error, bank: bank);
+        _showAlert(false, error);
       });
     }
   }
 
   /// Function to show alert popup either success or failed
   void _showAlert(bool success, String message, {Banks? bank}){
-    // Alert(
-    //   context: context,
-    //   type: success ? AlertType.success : AlertType.error,
-    //   title: success ? "Success" : "Failed",
-    //   desc: message,
-    //   buttons: [
-    //     DialogButton(
-    //       child: Text(
-    //         "OK",
-    //         style: TextStyle(color: Colors.white, fontSize: 20),
-    //       ),
-    //       color: success ? Color(0xFF1FD47D) : Colors.red,
-    //       onPressed: () {
-    //         if(success){
-    //           Navigator.pop(context);
-    //           Navigator.pop(context);
-    //           Navigator.pop(context);
-    //           _requestReview();
-    //         }
-    //         else {
-    //           Navigator.pop(context);
-    //           Navigator.pop(context);
-    //           if (bank != null) {
-    //             _sendWhatsappMessage(bank);
-    //           }
-    //           else {
-    //             Navigator.pop(context);
-    //           }
-    //         }
-    //       },
-    //       width: 120,
-    //     )
-    //   ],
-    // ).show();
-
-    AlertDialog(
-      title: Text(success ? "Success" : "Failed"),
-      actions: [
-        SizedBox(
-          width: 120,
-          child: TextButton(
-          style: TextButton.styleFrom(foregroundColor: success ? Color(0xFF1FD47D) : Colors.red, ),
+    Alert(
+      context: context,
+      type: success ? AlertType.success : AlertType.error,
+      title: success ? "Success" : "Failed",
+      desc: message,
+      buttons: [
+        DialogButton(
           child: Text(
             "OK",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
+          color: success ? Color(0xFF1FD47D) : Colors.red,
           onPressed: () {
             if(success){
               Navigator.pop(context);
               Navigator.pop(context);
-            } else {
               Navigator.pop(context);
+              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Wallet(),)
+              );
+              _requestReview();
+            }
+            else {
+              Navigator.pop(context);
+              Navigator.pop(context);
+              if (bank != null) {
+                _sendWhatsappMessage(bank);
+              }
+              else {
+                Navigator.pop(context);
+              }
             }
           },
-          //width: 120,
-        ),
-        ),
+          width: 120,
+        )
       ],
-    );
+    ).show();
 
 
 

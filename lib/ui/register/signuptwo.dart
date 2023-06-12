@@ -34,11 +34,14 @@ class SignUpTwo extends StatefulWidget {
 
   final CreateUser user;
   final int payload;
+  final CreateUser createUser;
 
   const SignUpTwo({
     Key? key,
     required this.payload,
     required this.user,
+    required this.createUser,
+  // @required this.use
   }) : super(key: key);
 
 
@@ -54,6 +57,7 @@ class _SignUpTwoState extends State<SignUpTwo> {
 
   /// A [GlobalKey] to hold the form state of my form widget for form validation
   final _formKey = GlobalKey<FormState>();
+
 
   File? _image;
 
@@ -102,6 +106,21 @@ class _SignUpTwoState extends State<SignUpTwo> {
   /// Function that creates a new user by calling
   /// [signUp] in the [RestDataSource] class
   void _createUser() async {
+    print('bad');
+    List<http.MultipartFile> uploads = [];
+    widget.user.phone = _number.phoneNumber!.trim();
+    widget.user.dateOfBirth = _dateOfBirth!.trim();
+    widget.user.gender = _selectedGender!.trim();
+    if (widget.user.referralCode== null) {
+      widget.user.referralCode= 'nil';
+    } 
+    if (_image != null) {
+      uploads.add(
+        await http.MultipartFile.fromPath("image", _image!.path, filename: "image${DateTime.now()}.${_image!.path.split('.').last}"),
+      );
+      widget.user.image = uploads;
+    } 
+
     var api = RestDataSource();
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
     String? token = await firebaseMessaging.getToken();
@@ -659,7 +678,9 @@ class _SignUpTwoState extends State<SignUpTwo> {
       });
       return null;
     } else {
+      setState(() { _showSpinner = true; });
       form.save();
+      print('yh: yh');
       _createUser();
     }
   }

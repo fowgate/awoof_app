@@ -59,6 +59,7 @@ const TOP_AND_RECENT_WINNERS = BASE_URL + "giveaways/get/latestandtop";
 const TOP_GIVERS = BASE_URL + "giveaways/get/topgivers";
 const ALL_GIVERS = BASE_URL + "giveaways/get/top_givers_giveaways";
 const MY_GIVEAWAY_WINNINGS = BASE_URL + "giveaways/get_my_wins";
+const SEND_GIVEAWAY_PAY_MAIL = BASE_URL + "giveaways/send_mail";
 
 const GIVEAWAY_CONDITIONS = BASE_URL + "giveaway-conditions";
 const GIVEAWAY_TYPES = BASE_URL + "giveaway-types";

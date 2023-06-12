@@ -6,8 +6,10 @@ import 'package:awoof_app/utils/constants.dart';
 import 'package:awoof_app/utils/size-config.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:awoof_app/utils/rflutter_alert-2.0.4/lib/rflutter_alert.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter/services.dart';
+
 
 class Airtime extends StatefulWidget {
 
@@ -659,42 +661,18 @@ class _AirtimeState extends State<Airtime> {
   }
 
   void _showAlert(bool success, String message){
-    // Alert(
-    //   context: context,
-    //   type: success ? AlertType.success : AlertType.error,
-    //   title: success ? "Success" : "Failed",
-    //   desc: message,
-    //   buttons: [
-    //     DialogButton(
-    //       child: Text(
-    //         "OK",
-    //         style: TextStyle(color: Colors.white, fontSize: 20),
-    //       ),
-    //       color: success ? Color(0xFF1FD47D) : Colors.red,
-    //       onPressed: () {
-    //         if(success){
-    //           Navigator.pop(context);
-    //           Navigator.pop(context);
-    //         } else {
-    //           Navigator.pop(context);
-    //         }
-    //       },
-    //       width: 120,
-    //     )
-    //   ],
-    // ).show();
-
-    AlertDialog(
-      title: Text(success ? "Success" : "Failed"),
-      actions: [
-        SizedBox(
-          width: 120,
-          child: TextButton(
-          style: TextButton.styleFrom(foregroundColor: success ? Color(0xFF1FD47D) : Colors.red, ),
+    Alert(
+      context: context,
+      type: success ? AlertType.success : AlertType.error,
+      title: success ? "Success" : "Failed",
+      desc: message,
+      buttons: [
+        DialogButton(
           child: Text(
             "OK",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
+          color: success ? Color(0xFF1FD47D) : Colors.red,
           onPressed: () {
             if(success){
               Navigator.pop(context);
@@ -703,16 +681,10 @@ class _AirtimeState extends State<Airtime> {
               Navigator.pop(context);
             }
           },
-          //width: 120,
-        ),
-        ),
+          width: 120,
+        )
       ],
-    );
-
-
-
-
-
+    ).show();
   }
 
 }

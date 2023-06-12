@@ -5,6 +5,7 @@ import 'package:awoof_app/utils/size-config.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:flutter/services.dart';
+import 'package:awoof_app/utils/rflutter_alert-2.0.4/lib/rflutter_alert.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Verify extends StatefulWidget {
@@ -855,63 +856,33 @@ class _VerifyState extends State<Verify> {
   }
 
   void _showAlert(bool success, String desc, {Function? whereTo}){
-    AlertDialog(
-      title: Text(
-            success ? "Success" : "Failed",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-      //desc: desc,
-      
-      actions: [
-         SizedBox(
-          width: 120,
-          child: TextButton(
+       Alert(
+      context: context,
+      type: success ? AlertType.success : AlertType.error,
+      title: success ? "Success" : "Failed",
+      desc: desc,
+      buttons: [
+        DialogButton(
           child: Text(
             "OK",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
-          style: TextButton.styleFrom(foregroundColor: success ? Color(0xFF1FD47D) : Colors.red, ),
+          color: success ? Color(0xFF1FD47D) : Colors.red,
           onPressed: () {
             if(success){
               Navigator.pop(context);
-              whereTo;
+              Navigator.pop(context);
             } else {
               Navigator.pop(context);
             }
           },
+          width: 120,
         )
-        ),
-        
       ],
-    );
+    ).show();
 
 
 
-
-// AlertDialog(
-//       title: Text(success ? "Success" : "Failed"),
-//       actions: [
-//         SizedBox(
-//           width: 120,
-//           child: TextButton(
-//           style: TextButton.styleFrom(foregroundColor: success ? Color(0xFF1FD47D) : Colors.red, ),
-//           child: Text(
-//             "OK",
-//             style: TextStyle(color: Colors.white, fontSize: 20),
-//           ),
-//           onPressed: () {
-//             if(success){
-//               Navigator.pop(context);
-//               Navigator.pop(context);
-//             } else {
-//               Navigator.pop(context);
-//             }
-//           },
-//           //width: 120,
-//         ),
-//         ),
-//       ],
-//     );
 
 
 

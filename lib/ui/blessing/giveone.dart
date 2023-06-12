@@ -4,6 +4,7 @@ import 'package:awoof_app/utils/constants.dart';
 import 'package:awoof_app/utils/size-config.dart';
 import 'package:awoof_app/utils/switch.dart';
 import 'package:flutter/material.dart';
+import 'package:awoof_app/utils/flutter_datetime_picker-1.5.1/lib/flutter_datetime_picker.dart';
 //import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter/services.dart';
 
@@ -358,7 +359,7 @@ class _GiveOneState extends State<GiveOne> {
                   onChanged: (value) {
                     if(!mounted)return;
                     setState(() {
-                      _selectedAmount = _selectedAmount;
+                      _selectedAmount = value;//_selectedAmount;
                       if(_winnerController.text != '' && _winnerController.text.isNotEmpty && _winnerController.text != null && _selectedAmount != null){
                         try{
                           _amountController.text = Constants.money((double.parse(_winnerController.text) * _selectedAmount!), '');
@@ -593,28 +594,28 @@ class _GiveOneState extends State<GiveOne> {
   /// Function to show the bottom date time picker fo selecting frequency time
   void _showDateTime(){
     DateTime now = DateTime.now();
-    // DatePicker.showDateTimePicker(
-    //     context,
-    //     showTitleActions: true,
-    //     minTime: DateTime.now(),
-    //     maxTime: DateTime(now.year, now.month, now.day + 8),
-    //     onChanged: (date) {
-    //       if(!mounted)return;
-    //       setState(() {
-    //         _frequencyController.text = Constants.getTimeLeft(date);
-    //         _endAt = date;
-    //       });
-    //     },
-    //     onConfirm: (date) {
-    //       if(!mounted)return;
-    //       setState(() {
-    //         _frequencyController.text = Constants.getTimeLeft(date);
-    //         _endAt = date;
-    //       });
-    //     },
-    //     currentTime: DateTime.now(),
-    //     locale: LocaleType.en
-    // );
+    DatePicker.showDateTimePicker(
+        context,
+        showTitleActions: true,
+        minTime: DateTime.now(),
+        maxTime: DateTime(now.year, now.month, now.day + 8),
+        onChanged: (date) {
+          if(!mounted)return;
+          setState(() {
+            _frequencyController.text = Constants.getTimeLeft(date);
+            _endAt = date;
+          });
+        },
+        onConfirm: (date) {
+          if(!mounted)return;
+          setState(() {
+            _frequencyController.text = Constants.getTimeLeft(date);
+            _endAt = date;
+          });
+        },
+        currentTime: DateTime.now(),
+        locale: LocaleType.en
+    );
   }
 
   /// Function to save the details of giveaway

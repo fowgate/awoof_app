@@ -9,6 +9,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'paystack-webview.dart';
+import 'package:awoof_app/utils/rflutter_alert-2.0.4/lib/rflutter_alert.dart';
+import 'package:awoof_app/ui/bottom-navs/home/home.dart';
+
 
 class GiveThree extends StatefulWidget {
 
@@ -73,7 +76,7 @@ class _GiveThreeState extends State<GiveThree> {
   String _getFormattedTime() {
     return DateFormat('d, MMMM').format(DateTime.now()).toString();
   }
-
+  
   /// Setting the current user's email to [_userEmail], id to [_userId] and
   /// balance to [_balance]
   void _getCurrentUser() async {
@@ -395,6 +398,7 @@ class _GiveThreeState extends State<GiveThree> {
 
   @override
   Widget build(BuildContext context) {
+    return StatefulBuilder(builder: (context, setModalState) {
     SizeConfig().init(context);
     return Scaffold(
       backgroundColor: Color(0xFF09AB5D),
@@ -916,10 +920,15 @@ class _GiveThreeState extends State<GiveThree> {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
-                      payModalSheet(context);
+                       String msg= "Thank you for submitting a Giveaway in Awoof. Please kindly check your email for next steps. Please check your spam if you don't find the mail in your inbox.";
+                      //payModalSheet(context);
+                     if(!mounted)return;
+                      setModalState(() { _state = 1; });
+                      _postGiveAway(widget.giveaway, setModalState);
+                      _showAlert(true, msg);
                     },
                     child: Text(
-                      _state == 3 ? 'Post Giveaway' : 'Continue to Payment',
+                      _state == 3 ? 'Post Giveaway' : 'Proceed to Submit Giveaway',
                       style: TextStyle(
                         fontSize: 17,
                         fontFamily: "Bold",
@@ -936,6 +945,7 @@ class _GiveThreeState extends State<GiveThree> {
         ),
       ),
     );
+    });
   }
 
   /// Function to set up button states in sync with [_state]
@@ -1109,6 +1119,46 @@ class _GiveThreeState extends State<GiveThree> {
     });
   }
 
+  void _sendMail(){
+  var api = RestDataSource();
+  api.giveawayPay('12345x')
+  .catchError((err){
+    if(!mounted)return;
+    Constants.showError(context, 'err');
+  });
+    
+  }
+
+  /// Function to show alert popup either success or failed
+  void _showAlert(bool success, String message){
+    Alert(
+      context: context,
+      type: success ? AlertType.success : AlertType.error,
+      title: success ? "Success" : "Failed",
+      desc: message,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Continue to dashboard",
+            style: TextStyle(color: Colors.white, fontSize: 13),
+          ),
+          color: success ? Color.fromARGB(255, 84, 135, 245) : Colors.red,
+          onPressed: () {
+             Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => const Home(),
+                      ),
+                    );
+          },
+          width: 200,
+        )
+      ],
+    ).show();
+
+
+  }
+
   /// Function to make payments and check out using paystack plugin
   /*void _checkOut(String accessCode, double amount, StateSetter setModalState) async {
     try {
@@ -1140,6 +1190,17 @@ class _GiveThreeState extends State<GiveThree> {
       Constants.showError(context, e);
     }
   }*/
+
+   /// Function that verifies payment by calling
+  /// [verifyPayment] in the [RestDataSource] class
+  void _saveGiveaway( StateSetter setModalState) async {
+      widget.giveaway.paymentType = 'pending';
+      widget.giveaway.paymentStatus = 'pending';
+      widget.giveaway.paymentReference = 'pending';
+      widget.giveaway.gatewayResponse = 'Submitted by user';
+      await _postGiveAway(widget.giveaway, setModalState);
+  }
+
 
   /// Function that verifies payment by calling
   /// [verifyPayment] in the [RestDataSource] class
@@ -1212,7 +1273,7 @@ class _GiveThreeState extends State<GiveThree> {
     await api.postGiveaway(giveaway).then((value) async {
       if(!mounted)return;
       setModalState(() { _state = 5; });
-      Navigator.pushReplacementNamed(context, GiveawaySuccessful.id);
+      //Navigator.pushReplacementNamed(context, GiveawaySuccessful.id);
     }).catchError((e){
       print(e);
       setModalState(() { _state = 3; });

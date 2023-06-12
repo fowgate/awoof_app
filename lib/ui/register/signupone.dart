@@ -650,6 +650,7 @@ class _SignUpOneState extends State<SignUpOne> {
             builder: (context) => SignUpTwo(
               user: user,
               payload: 1,
+              createUser: user
             ),
           ),
         );
